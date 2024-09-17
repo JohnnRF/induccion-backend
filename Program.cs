@@ -3,15 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Conexión a la base de datos
 builder.Services.AddNpgsql<InduccionContext>(builder.Configuration.GetConnectionString("InduccionDb"));
+
+// Servicio para el uso de los controladores
+builder.Services.AddControllers();
+
 var app = builder.Build();
+
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/dbconexion",async ([FromServices] InduccionContext dbContext)  => {
-    dbContext.Database.EnsureCreated();
-
-    return Results.Ok("Base de datos creada");
-});
+// Mapeo de las rutas de los controladores
+app.MapControllers();
 
 app.Run();
