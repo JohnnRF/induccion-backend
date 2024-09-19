@@ -16,9 +16,62 @@ namespace induccionef.Controllers
     
         //GET
         [HttpGet]
-        public async Task<ActionResult<Product>> GetAll(){
-            var products = await _context.Products.ToListAsync();
-            return Ok(products);
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int? page, 
+            [FromQuery] int? pageSize,
+            [FromQuery] string? search = null,
+            [FromQuery] bool? active = null,
+            [FromQuery] int? minStock = null
+
+            )
+        {
+
+            // Consulta base
+            var query = _context.Products.AsQueryable();
+
+            // Filtro busqueda por nombre
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(search.ToLower()));          
+            }
+
+            //  Filtro busqueda de productos activos o inactivos
+            if (active.HasValue)
+            {
+                query = query.Where(p => p.Active == active.Value);
+            }
+
+            // Filtro busqueda de productos por mínimo stock
+            if (minStock.HasValue)
+            {
+                query = query.Where(p => p.Stock >= minStock.Value);
+            }
+
+            // Total de registros después de aplicar los filtros
+            int total_records = await query.CountAsync();
+
+            // número de página 
+            int _page = page ?? 1;
+            // cantidad de registros por página
+            int _pageSize = pageSize ?? 5;
+            // calcular total de páginas
+            int total_pages = (int)Math.Ceiling((decimal)total_records/_pageSize);
+
+            // Paginación 
+            // Obtener los productos para la página actual
+            var products = await query
+                .Skip((_page - 1) * _pageSize)
+                .Take(_pageSize)
+                .ToListAsync();
+
+            // Respuesta con filtros y paginación
+            return Ok(new {
+                totalRecords = total_records,
+                totalPages   = total_pages,
+                currentPage  = _page,
+                pageSize     = _pageSize,
+                products
+            });
         }
 
         //POST
