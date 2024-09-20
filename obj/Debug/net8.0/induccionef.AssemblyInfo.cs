@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("induccionef")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cb1981f7cb1f6440c2cd3d8b089e91fdf536578")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83d32c56f80f08ed33a0c27a31509da3155a73d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("induccionef")]
 [assembly: System.Reflection.AssemblyTitleAttribute("induccionef")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
