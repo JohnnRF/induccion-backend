@@ -5,7 +5,7 @@ using induccionef.Pagination;
 
 namespace induccionef.Controllers
 {
-    [Route("api/bodega")]
+    [Route("api/[controller]")]
     [ApiController]
     public class BodegaController: ControllerBase
     {

@@ -20,8 +20,9 @@ public class Product{
     public bool Active { get; set;}
 
     public int BodegaId {get; set;}
+    public DateTime FechaIngreso {get; set;}
 
     [ForeignKey("BodegaId")]
-    [JsonIgnore]
+    //[JsonIgnore]
     public Bodega? bodega{ get; set;}    
 }

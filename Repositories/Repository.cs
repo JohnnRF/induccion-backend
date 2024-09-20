@@ -48,9 +48,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
             .ToListAsync();
     }
 
-    public void Update(TEntity entity)
+    public async Task Update(TEntity entity)
     {
         _dbSet.Update(entity);
-        _context.SaveChangesAsync();
+       await _context.SaveChangesAsync();
     }
 }

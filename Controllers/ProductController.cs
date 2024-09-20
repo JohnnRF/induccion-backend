@@ -24,11 +24,13 @@ namespace induccionef.Controllers
             [FromQuery] int? pageSize,
             [FromQuery] string? search = null,
             [FromQuery] bool? active = null,
-            [FromQuery] int? minStock = null
+            [FromQuery] int? minStock = null,
+            [FromQuery] DateTime? entryDate = null,
+            [FromQuery] int? bodegaId = null
 
             )
         {
-            var filteredProducts = await _productRepository.GetFilteredAsync(search, active, minStock );
+            var filteredProducts = await _productRepository.GetFilteredAsync(search, active, minStock, entryDate, bodegaId);
 
             // Número de página 
             int _page = page ?? 1;
@@ -62,13 +64,8 @@ namespace induccionef.Controllers
             {
                 return BadRequest("El id del producto no coincide con el id de la URL");
             }
-            var existingProduct = await _productRepository.GetByIdAsync(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
 
-            _productRepository.Update(product);
+           await _productRepository.Update(product);
 
             return NoContent();
         }

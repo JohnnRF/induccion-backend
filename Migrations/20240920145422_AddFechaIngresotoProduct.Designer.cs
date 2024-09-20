@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using induccionef;
@@ -11,9 +12,11 @@ using induccionef;
 namespace induccionef.Migrations
 {
     [DbContext(typeof(InduccionContext))]
-    partial class InduccionContextModelSnapshot : ModelSnapshot
+    [Migration("20240920145422_AddFechaIngresotoProduct")]
+    partial class AddFechaIngresotoProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

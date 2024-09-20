@@ -7,7 +7,7 @@ public class ProductRepository : Repository<Product>
 {
     public ProductRepository(InduccionContext context) : base(context){ }
 
-    public async  Task<IEnumerable<Product>> GetFilteredAsync(string search, bool? active, int? minStock)
+    public async  Task<IEnumerable<Product>> GetFilteredAsync(string search, bool? active, int? minStock, DateTime? entryDate, int? bodegaId)
     {
         var query = _context.Products.Include((x)=> x.bodega).AsQueryable();
 
@@ -27,6 +27,15 @@ public class ProductRepository : Repository<Product>
             if (minStock.HasValue)
             {
                 query = query.Where(p => p.Stock >= minStock.Value);
+            }
+
+            if (entryDate.HasValue)
+            {
+                query = query.Where(p => p.FechaIngreso <= entryDate.Value);
+            }
+            if (bodegaId.HasValue)
+            {
+                query = query.Where(p => p.BodegaId == bodegaId.Value);
             }
         return await query.ToListAsync();
     }
