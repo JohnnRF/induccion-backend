@@ -1,4 +1,5 @@
 using induccionef;
+using induccionef.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,9 @@ builder.Services.AddCors(options =>{
                         });
 });
 
+// Servicio para el uso de los Repository
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<BodegaRepository>();
 // Servicio para el uso de los controladores
 builder.Services.AddControllers();
 

@@ -1,6 +1,8 @@
 using induccionef.Models;
+using induccionef.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using induccionef.Pagination;
 
 namespace induccionef.Controllers
 {
@@ -8,12 +10,13 @@ namespace induccionef.Controllers
     [ApiController]
     public class ProductController : ControllerBase{
         
-        private readonly InduccionContext _context;
+        private readonly ProductRepository _productRepository;
 
-        public ProductController(InduccionContext context){
-            _context = context;
+        public ProductController(ProductRepository productRepository)
+        {
+            _productRepository = productRepository;
         }
-    
+
         //GET
         [HttpGet]
         public async Task<IActionResult> GetAll(
@@ -25,62 +28,30 @@ namespace induccionef.Controllers
 
             )
         {
+            var filteredProducts = await _productRepository.GetFilteredAsync(search, active, minStock );
 
-            // Consulta base
-            var query = _context.Products.AsQueryable();
-
-            // Filtro busqueda por nombre
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(p => p.Name.ToLower().Contains(search.ToLower()));          
-            }
-
-            //  Filtro busqueda de productos activos o inactivos
-            if (active.HasValue)
-            {
-                query = query.Where(p => p.Active == active.Value);
-            }
-
-            // Filtro busqueda de productos por mínimo stock
-            if (minStock.HasValue)
-            {
-                query = query.Where(p => p.Stock >= minStock.Value);
-            }
-
-            // Total de registros después de aplicar los filtros
-            int total_records = await query.CountAsync();
-
-            // número de página 
+            // Número de página 
             int _page = page ?? 1;
-            // cantidad de registros por página
+            // Cantidad de registros por página
             int _pageSize = pageSize ?? 5;
-            // calcular total de páginas
-            int total_pages = (int)Math.Ceiling((decimal)total_records/_pageSize);
 
-            // Paginación 
-            // Obtener los productos para la página actual
-            var products = await query
-                .Skip((_page - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToListAsync();
+            var paginationResult = PaginationResult.Paginate(filteredProducts, _page, _pageSize);
 
-            // Respuesta con filtros y paginación
-            return Ok(new {
-                totalRecords = total_records,
-                totalPages   = total_pages,
-                currentPage  = _page,
-                pageSize     = _pageSize,
-                products
-            });
+            return Ok(paginationResult);
         }
 
         //POST
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product){
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            
+            if (product == null)
+            {
+                return BadRequest("Error");
+            }
 
-            return Ok(product);
+            await _productRepository.AddAsync(product);
+
+            return Ok();
         }
 
         //PUT
@@ -91,8 +62,13 @@ namespace induccionef.Controllers
             {
                 return BadRequest("El id del producto no coincide con el id de la URL");
             }
-            _context.Entry(product).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existingProduct = await _productRepository.GetByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            _productRepository.Update(product);
 
             return NoContent();
         }
@@ -100,13 +76,14 @@ namespace induccionef.Controllers
         //DELETE
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id){
-            var product = await _context.Products.FindAsync(id);
+            var product = await _productRepository.GetByIdAsync(id);
+
             if (product == null){
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            
+            await _productRepository.DeleteAsync(id);
 
             return NoContent();
         }
